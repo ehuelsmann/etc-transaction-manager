@@ -1,0 +1,79 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use ETM;
+use File::Basename;
+use Getopt::Long;
+
+use String::ShellQuote;
+
+
+my $verbose = 1; # be verbose "1" by default (extra-verbose == 2; quiet == 0)
+my $basename = basename($0);
+
+sub help {
+    print <<EOF;
+$basename <options> <command> <arguments>
+EOF
+
+}
+
+sub quiet {
+    $verbose = 0;
+}
+
+sub verbose {
+    $verbose = 2;
+}
+
+sub version {
+    print <<EOF;
+$basename: version $ETM::VERSION
+EOF
+     exit 0;
+}
+
+sub error {
+    my ($error, %options) = @_;
+    print "basename: $error\n";
+    &help unless $options{nohelp};
+    exit 1;
+}
+
+GetOptions(
+    'verbose' => \&verbose,
+    'quiet'   => \&quiet,
+    'version' => \&version,
+    'help'    => \&help,
+    );
+
+my %commands = (
+    'init'   => \&ETM::init,
+    'tear'   => \&ETM::jail_teardown,
+    );
+
+if (scalar(@ARGV) > 0) {
+    # dispatch command
+    my ($command, @arguments) = @ARGV;
+
+    if (exists $commands{$command}) {
+        &{$commands{$command}}(
+             {
+                 verbosity => $verbose,
+                 error     => \&error,
+             },
+             @arguments);
+    }
+    else {
+        error "Invalid command '$command'";
+    }
+}
+else {
+    error "No command supplied";
+}
+
+
+exit 0;
+
