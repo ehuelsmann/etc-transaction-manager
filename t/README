@@ -1,0 +1,35 @@
+
+
+Content
+=======
+
+ * Test structure
+ * Disk layout
+
+
+Test structure
+--------------
+
+A test is considered to mean a .t file. Each test follows the sequence
+listed below:
+
+ - Create temporary (test) directory
+ - Set up the preconditions for the test
+   * Create the correct subdirectories within the test directory
+   * Copy test data from the t/data/ directory into the test directory
+ - Execute the tests
+ - Remove the temporary directory (unless prevented by environment variable)
+
+
+The temporary directory is created in the /tmp directory. When the script
+terminates, the test directory is removed, unless the environment variable
+ETM_TEST_CLEANUP has the value "N".
+
+
+Disk layout
+-----------
+
+The t/ directory holds the test cases. The t/data/ subdirectory holds the
+data used by the test cases. Each test may have a separate subdirectory
+within the t/data/ directory for its own test data.
+
