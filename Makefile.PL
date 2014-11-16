@@ -13,5 +13,16 @@ WriteMakefile(
     VERSION_FROM  => 'lib/ETM.pm',
     EXE_FILES     => [ 'bin/etm', ],
     LICENSE       => 'apache_2_0',
-    
+    META_MERGE    => {
+	resources    => {
+	    repository => {
+		type => 'git',
+		url => 'git://github.com/ehuelsmann/etc-transaction-manager.git',
+		web => 'https://github.com/ehuelsmann/etc-transaction-manager',
+	    },
+	    bugtracker => {
+		web => 'https://github.com/ehuelsmann/etc-transaction-manager/issues',
+	    },
+	},
+    },	    
 );
