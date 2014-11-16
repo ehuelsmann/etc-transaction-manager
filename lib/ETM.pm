@@ -7,15 +7,15 @@ use English;
 use Exporter;
 
 use Config::IniFiles;
-use File::Copy qw(cp);
+use File::Copy qw(cp);                     # Core
 use File::Copy::Recursive qw(dircopy);
-use File::Path qw(make_path remove_tree);
-use File::Spec::Functions;
-use Time::HiRes qw(gettimeofday);
+use File::Path qw(make_path remove_tree);  # Core
+use File::Spec::Functions;                 # Core
+use Time::HiRes qw(gettimeofday);          # Core
 
 use String::ShellQuote;
 
-our $VERSION = '0.0.0';
+use version; our $VERSION = qv('0.0.0');
 
 # parameterize these in order to allow overriding them for testing
 our $repo = $ENV{ETM_REPODIR} || '/var/lib/etm/repos';
@@ -127,6 +127,7 @@ sub init {
     make_path $initial_version
         or die "Could not create initial configuration directory $initial_version";
 
+    # use the /bin/cp binary, because we can wrap it in a sudo or su command
     system wrap_for_access "cp -rp /etc " .
         shell_quote  catfile($initial_version, 'etc');
     die "Could not copy $etc into $initial_version/etc"
