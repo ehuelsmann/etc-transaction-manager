@@ -9,7 +9,7 @@ WriteMakefile(
 	'File::Copy::Recursive' => 0,
         'String::ShellQuote'    => 0,
     },
-    TEST_REQUIRES => { 'Test::Simple' => 0, },
+    BUILD_REQUIRES => { 'Test::Simple' => 0, },
     VERSION_FROM  => 'lib/ETM.pm',
     EXE_FILES     => [ 'bin/etm', ],
     LICENSE       => 'bsd',
