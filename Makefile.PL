@@ -12,6 +12,6 @@ WriteMakefile(
     BUILD_REQUIRES => { 'Test::Simple' => 0, },
     VERSION_FROM  => 'lib/ETM.pm',
     EXE_FILES     => [ 'bin/etm', ],
-    LICENSE       => 'bsd',
+    LICENSE       => 'apache_2_0',
     
 );
