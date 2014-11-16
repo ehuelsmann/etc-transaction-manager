@@ -5,6 +5,7 @@ use strict;
 use warnings;
 use English;
 use Exporter;
+use POSIX;
 
 use Config::IniFiles;
 use File::Copy qw(cp);                     # Core
@@ -50,7 +51,16 @@ sub wrap_for_access {
 }
 
 sub write_version_metadata {
-    my ($path, %options) = @_;
+    my $path = shift @_;
+    my $localtime = localtime();
+    my $time = gettimeofday();
+    my %options = (
+	date => $localtime,
+	time => $time,
+	based_on => '',
+	desc => '',
+	description => '',
+	@_);
 
     open FH, ">" . catfile($path, 'etm-meta.yml');
     print FH <<EOF;
@@ -60,7 +70,7 @@ based_on: $options{based_on}
 desc: $options{desc}
 description: $options{description}
 EOF
-
+    close FH;
 
 }
 
@@ -100,10 +110,16 @@ sub new_jail_directory {
 sub new_transaction_from {
     my ($name) = @_;
     my $new_name = new_transaction_name;
+    my $new_path = catfile($repo, $name);
 
-    dircopy catfile($repo, $name), catfile($repo, $new_name)
+    dircopy $new_path, catfile($repo, $new_name)
         or die "Could not create new transaction '$repo/$new_name' from '$repo/$name'";
 
+    my $localtime = localtime();
+    write_version_metadata( $new_path, 
+			    based_on => $name,
+			    date => $localtime);
+    
     return $new_name;
 }
 
@@ -122,17 +138,21 @@ sub init {
         make_path $repo
             or die "Could not create configuration versioning repository $repo";
     }
+    if (! -d $roots) {
+	make_path $roots
+	    or die "Could not create chroot jails directory $roots";
+    }
 
     $initial_version = catfile($repo, $initial_version);
     make_path $initial_version
         or die "Could not create initial configuration directory $initial_version";
 
     # use the /bin/cp binary, because we can wrap it in a sudo or su command
-    system wrap_for_access "cp -rp /etc " .
-        shell_quote  catfile($initial_version, 'etc');
+    system wrap_for_access "cp -rp " . shell_quote($etc) . " " .
+        shell_quote( catfile($initial_version, 'etc') );
     die "Could not copy $etc into $initial_version/etc"
-        if $? != 0
-; 
+        if $? != 0;
+ 
     write_version_metadata $initial_version, desc => 'Initial'
         or die "Could not initialize initial configuration $initial_version";
 
